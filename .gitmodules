@@ -4,6 +4,3 @@
 [submodule "QRCode"]
 	path = QRCode
 	url = https://github.com/ricmoo/QRCode
-[submodule "Shared_OEPL_Definitions"]
-	path = shared_oepl_definitions
-	url = git@github.com:OpenEPaperLink/Shared_OEPL_Definitions.git
