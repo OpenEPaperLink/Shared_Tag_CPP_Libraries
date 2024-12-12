@@ -1,6 +1,6 @@
-[submodule "uzlib"]
-	path = uzlib
-	url = https://github.com/pfalcon/uzlib.git
 [submodule "QRCode"]
 	path = QRCode
-	url = https://github.com/ricmoo/QRCode
+	url = https://github.com/ricmoo/QRCode.git
+[submodule "uzlib"]
+	path = uzlib
+	url = https://github.com/pfalcon/uzlib

@@ -826,7 +826,7 @@ static bool downloadImageDataToEEPROM(const struct AvailDataInfo *avail) {
 }
 
 bool processImageDataAvail(struct AvailDataInfo *avail) {
-    struct imageDataTypeArgStruct arg = *((struct imageDataTypeArgStruct *)avail->dataTypeArgument);
+    struct imageDataTypeArgStruct arg = *((struct imageDataTypeArgStruct *)&avail->dataTypeArgument);
 
     // check if the size sent can be contained in the image slot
     if (avail->dataSize > tag.imageSize) {
