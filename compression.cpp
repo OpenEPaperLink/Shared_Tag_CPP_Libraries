@@ -16,14 +16,15 @@ int decompCallback(TINF_DATA *d) {
                 return dec->getNextCompressedBlockFromFlash();
         }
     }
-    #ifdef DEBUG_COMPRESSION
+#ifdef DEBUG_COMPRESSION
     printf("FS: Couldn't find callback...\n");
-    #endif
+#endif
     return -1;
 }
 
 decompress::decompress() {
     decompContexts.push_back(this);
+    this->outCache = (uint8_t*)malloc(OUT_CACHE_SIZE);
 }
 
 void decompress::seek(uint32_t address) {
@@ -108,8 +109,10 @@ decompress::~decompress() {
             decompContexts.erase(decompContexts.begin() + i);
     }
     if (this->dictionary) free(this->dictionary);
+    this->dictionary = nullptr;
     if (this->ctx) delete this->ctx;
     if (this->compBuffer) free(this->compBuffer);
+    if (this->outCache) free(this->outCache);
 }
 
 #ifdef ENABLE_OEPLFS
@@ -137,6 +140,15 @@ int decompress::getNextCompressedBlockFromFlash() {
 }
 
 uint32_t decompress::getBlock(uint32_t address, uint8_t *target, uint32_t len) {
+    // check if we have the requested block of data in cache
+    if (address >= cacheStart) {
+        if ((address + len) <= (cacheStart + cacheLen)) {
+            memcpy(target, (this->outCache) + (address - cacheStart), len);
+            // cache hit, copy cache to target
+            return len;
+        }
+    }
+
     if (address + len > decompressedSize) return 0;
     if (address < this->decompressedPos) {
         // reload file, start from scratch
@@ -154,7 +166,6 @@ uint32_t decompress::getBlock(uint32_t address, uint8_t *target, uint32_t len) {
     }
 
     // skip to the next part of the output stream
-
     if (address != decompressedPos) {
         uint8_t temp[ZLIB_CACHE_SIZE];
         while (this->decompressedPos < address) {
@@ -175,6 +186,12 @@ uint32_t decompress::getBlock(uint32_t address, uint8_t *target, uint32_t len) {
     ctx->dest_limit = ctx->dest + len;
 
     uzlib_uncompress(ctx);
+
+    // cache this decompressed block
+    memcpy(this->outCache, target, len % OUT_CACHE_SIZE);
+    cacheLen = len % OUT_CACHE_SIZE;
+    cacheStart = address;
+
     this->decompressedPos += len;
     return len;
 }

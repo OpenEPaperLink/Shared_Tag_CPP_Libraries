@@ -31,6 +31,9 @@ class decompress {
     uint32_t decompressedPos;
     uint32_t compressedSize;
     uint32_t compressedPos;
+    uint8_t* outCache;
+    uint16_t cacheLen;
+    uint32_t cacheStart;
 #ifdef ENABLE_OEPLFS
     OEPLFile *file = nullptr;
 #endif

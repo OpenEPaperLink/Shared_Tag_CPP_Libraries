@@ -121,7 +121,7 @@ class drawItem {
 
 class fontrender {
    public:
-    void epdPrintf(uint16_t x, uint16_t y, bool color, enum rotation ro, const char *c, ...);
+    void epdPrintf(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, const char *c, ...);
 
 #ifdef ENABLE_OEPLFS
     fontrender(char *name);
