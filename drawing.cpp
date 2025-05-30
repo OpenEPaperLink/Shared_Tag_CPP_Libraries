@@ -10,7 +10,7 @@ struct __attribute__((packed)) imageHeader {
 
 static drawItem *drawItems[DRAWITEM_LIST_SIZE] = {0};
 
-void addBufferedImage(uint16_t x, uint16_t y, bool color, enum rotation ro, const uint8_t *image, bool mask) {
+void addBufferedImage(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, const uint8_t *image, bool mask) {
     drawItem *di = new drawItem;
 
     di->setRotation(ro);
@@ -67,7 +67,7 @@ void addBufferedImage(uint16_t x, uint16_t y, bool color, enum rotation ro, cons
     di->addToList();
 }
 
-void addFlashImage(uint16_t x, uint16_t y, bool color, enum rotation ro, const uint8_t *image) {
+void addFlashImage(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, const uint8_t *image) {
     drawItem *di = new drawItem;
 
     di->setRotation(ro);
@@ -321,7 +321,7 @@ void drawImageAtAddress(uint32_t addr, uint8_t lut) {
 }
 }
 
-void drawRoundedRectangle(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, bool color) {
+void drawRoundedRectangle(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint8_t color) {
     uint16_t widthBytes = width / 8;
     if (width % 8) widthBytes++;
     uint32_t framebufferSize = widthBytes * height;
@@ -361,7 +361,7 @@ void drawRoundedRectangle(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t
     free(framebuffer);
 }
 
-void drawMask(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, bool color) {
+void drawMask(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint8_t color) {
     uint16_t widthBytes = width / 8;
     if (width % 8) widthBytes++;
     uint32_t framebufferSize = widthBytes * height;

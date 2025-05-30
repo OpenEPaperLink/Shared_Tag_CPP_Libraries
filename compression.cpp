@@ -23,8 +23,11 @@ int decompCallback(TINF_DATA *d) {
 }
 
 decompress::decompress() {
+    // register the context for the callback
     decompContexts.push_back(this);
-    this->outCache = (uint8_t*)malloc(OUT_CACHE_SIZE);
+
+    // allocate decompressed data cache
+    this->outCache = (uint8_t *)malloc(OUT_CACHE_SIZE);
 }
 
 void decompress::seek(uint32_t address) {
@@ -148,7 +151,7 @@ uint32_t decompress::getBlock(uint32_t address, uint8_t *target, uint32_t len) {
             return len;
         }
     }
-
+    
     if (address + len > decompressedSize) return 0;
     if (address < this->decompressedPos) {
         // reload file, start from scratch
@@ -165,35 +168,50 @@ uint32_t decompress::getBlock(uint32_t address, uint8_t *target, uint32_t len) {
         this->readHeader();
     }
 
+    uint32_t bufferStart = (address + len) - OUT_CACHE_SIZE;
+    uint32_t bufferEnd;
+
+    // don't read from before the start if a low address is requested
+    if (bufferStart > 512000) bufferStart = 0;
+
+    // don't start reading data that starts before the current pointer
+    if (bufferStart < this->decompressedPos) {
+        bufferStart = this->decompressedPos;
+        bufferEnd = bufferStart + len;
+    } else {
+        bufferEnd = bufferStart + OUT_CACHE_SIZE;
+    }
+    if (bufferEnd > this->decompressedSize) bufferEnd = this->decompressedSize;
+
     // skip to the next part of the output stream
-    if (address != decompressedPos) {
-        uint8_t temp[ZLIB_CACHE_SIZE];
-        while (this->decompressedPos < address) {
-            uint32_t readBytes = address - decompressedPos;
-            if (readBytes > ZLIB_CACHE_SIZE) readBytes = ZLIB_CACHE_SIZE;
+    if (bufferStart != decompressedPos) {
+        uint8_t temp[OUT_CACHE_SIZE];
+        while (this->decompressedPos < bufferStart) {
+            uint32_t readBytes = bufferStart - decompressedPos;
+            if (readBytes > OUT_CACHE_SIZE) readBytes = OUT_CACHE_SIZE;
             decompressedPos += readBytes;
-            this->ctx->dest = temp;
+            this->ctx->dest = this->outCache;
             ctx->dest_start = ctx->dest;
             ctx->dest_limit = ctx->dest + readBytes;
             uzlib_uncompress(ctx);
         }
     }
+
     uint32_t bytesLeft = this->decompressedSize - this->decompressedPos;
     if (len > bytesLeft) len = bytesLeft;
 
-    this->ctx->dest = (unsigned char *)target;
+    this->ctx->dest = (unsigned char *)this->outCache;
     ctx->dest_start = ctx->dest;
-    ctx->dest_limit = ctx->dest + len;
+    ctx->dest_limit = ctx->dest + (bufferEnd - bufferStart);
 
     uzlib_uncompress(ctx);
 
-    // cache this decompressed block
-    memcpy(this->outCache, target, len % OUT_CACHE_SIZE);
-    cacheLen = len % OUT_CACHE_SIZE;
-    cacheStart = address;
+    // save cache metadata
+    this->cacheLen = bufferEnd - bufferStart;
+    this->cacheStart = bufferStart;
 
-    this->decompressedPos += len;
-    return len;
+    this->decompressedPos += (bufferEnd - bufferStart);
+    return this->getBlock(address, target, len);
 }
 
 uint8_t decompress::readByte(uint32_t address) {

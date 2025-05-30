@@ -1,6 +1,7 @@
 #define COLOR_RED 1
 #define COLOR_BLACK 0
 #define COLOR_DUAL 2
+#define COLOR_YELLOW 2
 
 #define IMAGE_OR 1
 #define IMAGE_REPLACE 0
@@ -49,11 +50,11 @@ extern "C" {
 void drawImageAtAddress(uint32_t addr, uint8_t lut);
 }
 
-void addBufferedImage(uint16_t x, uint16_t y, bool color, enum rotation ro, const uint8_t *image, bool mask);
-void addFlashImage(uint16_t x, uint16_t y, bool color, enum rotation ro, const uint8_t *image);
+void addBufferedImage(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, const uint8_t *image, bool mask);
+void addFlashImage(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, const uint8_t *image);
 void addQR(uint16_t x, uint16_t y, uint8_t version, uint8_t scale, const char *c, ...);
-void drawRoundedRectangle(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, bool color);
-void drawMask(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, bool color);
+void drawRoundedRectangle(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint8_t color);
+void drawMask(uint16_t xpos, uint16_t ypos, uint16_t width, uint16_t height, uint8_t color);
 
 #ifdef ENABLE_OEPLFS
 void addFSImage(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, char *name);
