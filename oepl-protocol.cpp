@@ -588,8 +588,11 @@ static uint8_t *getDataBlock(const uint16_t blockSize) {
         }
 
 #ifdef FWNRF
-        doSleep(ack->pleaseWaitMs);
-        powerUp(INIT_UART | INIT_RADIO);
+        if (ack->pleaseWaitMs) {  // sleep until the AP is ready with the data
+            doSleep(ack->pleaseWaitMs);
+            powerUp(INIT_UART | INIT_RADIO);
+        }
+        // else the block parts are coming in already: keep the radio receiving, a radio reset would drop them
         radioRxEnable(true);
 #endif
 #ifdef FW88MZ100
