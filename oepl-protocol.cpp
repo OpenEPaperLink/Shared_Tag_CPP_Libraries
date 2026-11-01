@@ -829,6 +829,15 @@ static bool downloadImageDataToEEPROM(const struct AvailDataInfo *avail) {
 }
 
 bool processImageDataAvail(struct AvailDataInfo *avail) {
+#ifdef FWNRF
+    // a tag without a known display (empty or unknown UICR) can't show images: acknowledge them without storing
+    if (!tag.uicrValid) {
+        powerUp(INIT_RADIO);
+        sendXferComplete();
+        powerDown(INIT_RADIO);
+        return true;
+    }
+#endif
     struct imageDataTypeArgStruct arg = *((struct imageDataTypeArgStruct *)&avail->dataTypeArgument);
 
     // check if the size sent can be contained in the image slot
