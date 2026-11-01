@@ -124,7 +124,6 @@ uint8_t detectAP(const uint8_t channel) {
                     }
                 }
             }
-            HAL_msDelay(10);
         }
     }
     return 0;
