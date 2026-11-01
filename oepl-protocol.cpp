@@ -1017,7 +1017,6 @@ bool processAvailDataInfo(struct AvailDataInfo *avail) {
             memcpy(&(curBlock.ver), &(avail->dataVer), 8);
             curBlock.type = avail->dataType;
             memcpy(&xferDataInfo, (void *)avail, sizeof(struct AvailDataInfo));
-            uint16_t nfcsize = avail->dataSize;
             wdt10s();
             if (uint8_t *blockbuffer = getDataBlock(avail->dataSize)) {
                 xferDataInfo.dataSize = 0;  // mark as transfer not pending
@@ -1027,9 +1026,8 @@ bool processAvailDataInfo(struct AvailDataInfo *avail) {
                     // loadURLtoNTag();
                 } else {
                     // raw NFC data upload to the NFC IC
-                    // loadRawNTag(nfcsize);
+                    // loadRawNTag(avail->dataSize);
                 }
-                delay(13330);
                 free(blockbuffer);
                 powerDown(INIT_I2C);
                 powerUp(INIT_RADIO);
