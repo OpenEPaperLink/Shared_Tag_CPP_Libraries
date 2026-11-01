@@ -27,16 +27,16 @@ class decompress {
     bool readHeader();
     uint8_t *compBuffer = nullptr;
     // uint8_t *uncompBuffer = nullptr;
-    uint32_t decompressedSize;
-    uint32_t decompressedPos;
-    uint32_t compressedSize;
-    uint32_t compressedPos;
-    uint8_t* outCache;
-    uint32_t cacheLen;
-    uint32_t cacheStart;
+    uint32_t decompressedSize = 0;
+    uint32_t decompressedPos = 0;
+    uint32_t compressedSize = 0;
+    uint32_t compressedPos = 0;
+    uint8_t* outCache = nullptr;
+    uint32_t cacheLen = 0;
+    uint32_t cacheStart = 0;
 #ifdef ENABLE_OEPLFS
     OEPLFile *file = nullptr;
 #endif
-    uint32_t eepromBase;
+    uint32_t eepromBase = 0;
     uint8_t *dictionary = nullptr;
 };
