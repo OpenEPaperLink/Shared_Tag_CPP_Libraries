@@ -854,6 +854,7 @@ bool processImageDataAvail(struct AvailDataInfo *avail) {
                 // check if a version of this already exists
                 uint8_t slot = findSlotVer(avail->dataVer);
                 if (slot != 0xFF) {
+                    powerDown(INIT_EEPROM);
                     powerUp(INIT_RADIO);
                     sendXferComplete();
                     powerDown(INIT_RADIO);
