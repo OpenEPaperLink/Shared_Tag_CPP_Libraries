@@ -959,8 +959,7 @@ bool processAvailDataInfo(struct AvailDataInfo *avail) {
         case DATATYPE_IMG_RAW_1BPP:
         case DATATYPE_IMG_RAW_2BPP:
         case DATATYPE_IMG_ZLIB:
-            processImageDataAvail(avail);
-            break;
+            return processImageDataAvail(avail);
         case DATATYPE_FW_UPDATE:
             powerUp(INIT_EEPROM);
             if (uint32_t fwsize = downloadFWUpdate(avail)) {
