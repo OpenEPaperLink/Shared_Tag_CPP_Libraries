@@ -473,7 +473,7 @@ uint8_t findNextSlideshowImage(uint8_t start) {
     uint8_t c = start;
     while (1) {
         c++;
-        if (c > imgSlots) c = 0;
+        if (c >= imgSlots) c = 0;
         if (c == start) return c;
         eepromRead(getAddressForSlot(c), &eih, sizeof(struct EepromImageHeader));
         if (eih.validMarker == EEPROM_IMG_VALID) {
