@@ -727,7 +727,8 @@ static bool downloadImageDataToEEPROM(const struct AvailDataInfo *avail) {
                 // looped
                 powerDown(INIT_EEPROM);
                 printf("PROTO: no slot available...\n");
-                return true;
+                // nothing was stored: no 'transfer complete', and nothing to draw
+                return false;
             }
             struct EepromImageHeader eih;
             eepromRead(getAddressForSlot(nextImgSlot), &eih, sizeof(struct EepromImageHeader));
