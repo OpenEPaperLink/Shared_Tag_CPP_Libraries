@@ -974,10 +974,31 @@ bool processAvailDataInfo(struct AvailDataInfo *avail) {
         case DATATYPE_IMG_ZLIB:
             return processImageDataAvail(avail);
         case DATATYPE_FW_UPDATE:
+#ifdef FWNRF
+            // a file the bootloader would refuse is not downloaded at all; the xfer complete stops the AP offering it
+            if (!fwSizeOk(avail->dataSize)) {
+                printf("PROTO: firmware of %lu bytes refused\n", (unsigned long)avail->dataSize);
+                powerUp(INIT_RADIO);
+                sendXferComplete();
+                powerDown(INIT_RADIO);
+                return true;
+            }
+#endif
             powerUp(INIT_EEPROM);
             if (uint32_t fwsize = downloadFWUpdate(avail)) {
 #ifdef DEBUG_PROTO
                 printf("PROTO: firmware download complete, doing update.\n");
+#endif
+#ifdef FWNRF
+                powerUp(INIT_EEPROM);
+                if (!fwImageOk(fwsize)) {
+                    printf("PROTO: not a firmware for this tag, refused\n");
+                    powerDown(INIT_EEPROM);
+                    powerUp(INIT_RADIO);
+                    sendXferComplete();
+                    powerDown(INIT_RADIO);
+                    return true;
+                }
 #endif
                 powerUp(INIT_EPD);
                 // showApplyUpdate();
