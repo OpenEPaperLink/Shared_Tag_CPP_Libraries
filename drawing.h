@@ -49,6 +49,7 @@ typedef struct {
 extern "C" {
 void drawImageAtAddress(uint32_t addr, uint8_t lut);
 }
+bool drawAddImage(uint32_t addr);
 
 void addBufferedImage(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, const uint8_t *image, bool mask);
 void addFlashImage(uint16_t x, uint16_t y, uint8_t color, enum rotation ro, const uint8_t *image);

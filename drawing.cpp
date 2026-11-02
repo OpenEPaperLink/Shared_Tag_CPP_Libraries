@@ -215,8 +215,27 @@ void addQR(uint16_t x, uint16_t y, uint8_t version, uint8_t scale, const char *c
     di->addToList();
 }
 
+// Hooks for a display driver that can redraw only the pixels that change. epdPrepareDiff() runs before the new image
+// is added to the draw list, so the driver can first put the image that is on the screen into the display's memory;
+// epdImageShown() tells it which image is on the screen once drawn.
+__attribute__((weak)) void epdPrepareDiff(uint8_t lut) {
+    (void)lut;
+}
+__attribute__((weak)) void epdImageShown(uint32_t addr) {
+    (void)addr;
+}
+
 void drawImageAtAddressWrap(uint32_t addr, uint8_t lut) {
     selectLUT(lut);
+    epdPrepareDiff(lut);
+    if (!drawAddImage(addr)) return;
+    addOverlay();
+    draw();
+    epdImageShown(addr);
+}
+
+// adds the image stored at addr to the draw list
+bool drawAddImage(uint32_t addr) {
     struct EepromImageHeader eih;
     HAL_flashRead(addr, (uint8_t *)&eih, sizeof(struct EepromImageHeader));
 #ifdef DEBUG_DRAWING
@@ -282,7 +301,7 @@ void drawImageAtAddressWrap(uint32_t addr, uint8_t lut) {
                 delete di;
                 delete decomp[0];
                 free(decomp);
-                return;
+                return false;
             }
 
             di->imageHeaderOffset = decomp[0]->readByte(0);
@@ -311,8 +330,7 @@ void drawImageAtAddressWrap(uint32_t addr, uint8_t lut) {
             di->addToList();
         } break;
     }
-    addOverlay();
-    draw();
+    return true;
 }
 
 extern "C" {
